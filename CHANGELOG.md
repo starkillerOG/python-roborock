@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.12.0 (2025-02-21)
+
+### Features
+
+- Add cli status ([#333](https://github.com/Python-roborock/python-roborock/pull/333),
+  [`64e77d7`](https://github.com/Python-roborock/python-roborock/commit/64e77d7150babcc78ce3698fe98594891dcb7bd4))
+
+
 ## v2.11.3 (2025-02-19)
 
 ### Bug Fixes
