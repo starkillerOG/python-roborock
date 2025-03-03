@@ -68,3 +68,7 @@ class RoborockTooFrequentCodeRequests(RoborockException):
 
 class RoborockMissingParameters(RoborockException):
     """Class for Roborock missing parameters exceptions."""
+
+
+class RoborockTooManyRequest(RoborockException):
+    """Class for Roborock too many request exceptions."""

@@ -22,6 +22,7 @@ from roborock.exceptions import (
     RoborockMissingParameters,
     RoborockNoUserAgreement,
     RoborockTooFrequentCodeRequests,
+    RoborockTooManyRequest,
     RoborockUrlException,
 )
 
@@ -54,6 +55,8 @@ class RoborockApiClient:
                     raise RoborockMissingParameters(
                         "You are missing parameters for this request, are you sure you " "entered your username?"
                     )
+                elif response_code == 9002:
+                    raise RoborockTooManyRequest("Please temporarily disable making requests and try again later.")
                 raise RoborockUrlException(f"error code: {response_code} msg: {response.get('error')}")
             response_data = response.get("data")
             if response_data is None:
