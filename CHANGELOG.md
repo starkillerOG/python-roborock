@@ -1,6 +1,95 @@
 # CHANGELOG
 
 
+## v2.12.1 (2025-03-04)
+
+### Bug Fixes
+
+- Add error for web calls and saros dock
+  ([#343](https://github.com/Python-roborock/python-roborock/pull/343),
+  [`49fb137`](https://github.com/Python-roborock/python-roborock/commit/49fb1372aead96ad5b03222699ab150bf83b31f9))
+
+### Chores
+
+- **deps**: Bump aiohttp from 3.11.11 to 3.11.12
+  ([#328](https://github.com/Python-roborock/python-roborock/pull/328),
+  [`f2d0c39`](https://github.com/Python-roborock/python-roborock/commit/f2d0c39353aff0d2f63ba5402cbfd1fd5c9f70c3))
+
+--- updated-dependencies: - dependency-name: aiohttp dependency-type: direct:production
+
+update-type: version-update:semver-patch ...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+
+- **deps**: Bump aiohttp from 3.11.12 to 3.11.13
+  ([#340](https://github.com/Python-roborock/python-roborock/pull/340),
+  [`7c6bb54`](https://github.com/Python-roborock/python-roborock/commit/7c6bb544fe14b0512eb4cc73f3d92f19fc56f4f7))
+
+--- updated-dependencies: - dependency-name: aiohttp dependency-type: direct:production
+
+update-type: version-update:semver-patch ...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+
+- **deps**: Bump python-semantic-release/python-semantic-release
+  ([#338](https://github.com/Python-roborock/python-roborock/pull/338),
+  [`15f7705`](https://github.com/Python-roborock/python-roborock/commit/15f77056b8f2c4dcd2772812c6c2f9647f808bcd))
+
+Bumps
+  [python-semantic-release/python-semantic-release](https://github.com/python-semantic-release/python-semantic-release)
+  from 9.17.0 to 9.21.0. - [Release
+  notes](https://github.com/python-semantic-release/python-semantic-release/releases) -
+  [Changelog](https://github.com/python-semantic-release/python-semantic-release/blob/master/CHANGELOG.rst)
+  -
+  [Commits](https://github.com/python-semantic-release/python-semantic-release/compare/v9.17.0...v9.21.0)
+
+--- updated-dependencies: - dependency-name: python-semantic-release/python-semantic-release
+  dependency-type: direct:production
+
+update-type: version-update:semver-minor ...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+
+- **deps-dev**: Bump mypy from 1.14.1 to 1.15.0
+  ([#329](https://github.com/Python-roborock/python-roborock/pull/329),
+  [`2105cdf`](https://github.com/Python-roborock/python-roborock/commit/2105cdf2a29a1ad1c1c9117e3dff4c4548466d4f))
+
+Bumps [mypy](https://github.com/python/mypy) from 1.14.1 to 1.15.0. -
+  [Changelog](https://github.com/python/mypy/blob/master/CHANGELOG.md) -
+  [Commits](https://github.com/python/mypy/compare/v1.14.1...v1.15.0)
+
+--- updated-dependencies: - dependency-name: mypy dependency-type: direct:development
+
+update-type: version-update:semver-minor ...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+
+- **deps-dev**: Bump ruff from 0.9.4 to 0.9.9
+  ([#341](https://github.com/Python-roborock/python-roborock/pull/341),
+  [`4e80f7a`](https://github.com/Python-roborock/python-roborock/commit/4e80f7a86764240729982de3336173231fac6a08))
+
+Bumps [ruff](https://github.com/astral-sh/ruff) from 0.9.4 to 0.9.9. - [Release
+  notes](https://github.com/astral-sh/ruff/releases) -
+  [Changelog](https://github.com/astral-sh/ruff/blob/main/CHANGELOG.md) -
+  [Commits](https://github.com/astral-sh/ruff/compare/0.9.4...0.9.9)
+
+--- updated-dependencies: - dependency-name: ruff dependency-type: direct:development
+
+update-type: version-update:semver-patch ...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+
+
 ## v2.12.0 (2025-02-21)
 
 ### Features
@@ -172,9 +261,7 @@ Bumps [paho-mqtt](https://github.com/eclipse/paho.mqtt.python) from 1.6.1 to 2.1
 
 --- updated-dependencies: - dependency-name: paho-mqtt dependency-type: direct:production
 
-update-type: version-update:semver-major
-
-...
+update-type: version-update:semver-major ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -253,9 +340,7 @@ Bumps [aioresponses](https://github.com/pnuckowski/aioresponses) from 0.7.7 to 0
 
 --- updated-dependencies: - dependency-name: aioresponses dependency-type: direct:development
 
-update-type: version-update:semver-patch
-
-...
+update-type: version-update:semver-patch ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -740,7 +825,7 @@ BREAKING CHANGE: You must now specify what version api you want to use with clie
 
 * feat: add more zeo things
 
-### BREAKING CHANGES
+### Breaking Changes
 
 - You must now specify what version api you want to use with clients.
 
@@ -778,7 +863,7 @@ BREAKING CHANGE: You must now specify what version api you want to use with clie
 
 BREAKING CHANGE: You must now specify what version api you want to use with clients.
 
-### BREAKING CHANGES
+### Breaking Changes
 
 - You must now specify what version api you want to use with clients.
 
@@ -987,9 +1072,7 @@ Bumps [snok/install-poetry](https://github.com/snok/install-poetry) from 1.3.3 t
 
 --- updated-dependencies: - dependency-name: snok/install-poetry dependency-type: direct:production
 
-update-type: version-update:semver-patch
-
-...
+update-type: version-update:semver-patch ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -1537,9 +1620,7 @@ Bumps [wagoid/commitlint-github-action](https://github.com/wagoid/commitlint-git
 --- updated-dependencies: - dependency-name: wagoid/commitlint-github-action dependency-type:
   direct:production
 
-update-type: version-update:semver-minor
-
-...
+update-type: version-update:semver-minor ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -1554,9 +1635,7 @@ Updates the requirements on [pycryptodome](https://github.com/Legrandin/pycrypto
   [Changelog](https://github.com/Legrandin/pycryptodome/blob/master/Changelog.rst) -
   [Commits](https://github.com/Legrandin/pycryptodome/compare/v3.17.0...v3.18.0)
 
---- updated-dependencies: - dependency-name: pycryptodome dependency-type: direct:production
-
-...
+--- updated-dependencies: - dependency-name: pycryptodome dependency-type: direct:production ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
