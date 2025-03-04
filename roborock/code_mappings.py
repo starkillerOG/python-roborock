@@ -461,6 +461,7 @@ class RoborockDockTypeCode(RoborockEnum):
     s8_maxv_ultra_dock = 10
     qrevo_master_dock = 14
     qrevo_s_dock = 15
+    saros_r10_dock = 16
     qrevo_curv_dock = 17
 
 
