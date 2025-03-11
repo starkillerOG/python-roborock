@@ -1,6 +1,50 @@
 # CHANGELOG
 
 
+## v2.12.2 (2025-03-11)
+
+### Bug Fixes
+
+- Bad dock summary logic ([#345](https://github.com/Python-roborock/python-roborock/pull/345),
+  [`eda1e98`](https://github.com/Python-roborock/python-roborock/commit/eda1e98e5ea177e2eb2390d877b383780f938fd8))
+
+### Chores
+
+- **deps-dev**: Bump pytest from 8.3.4 to 8.3.5
+  ([#342](https://github.com/Python-roborock/python-roborock/pull/342),
+  [`53635ed`](https://github.com/Python-roborock/python-roborock/commit/53635eda2a2415fc5744f9ebdf8e80fb2df96ef0))
+
+Bumps [pytest](https://github.com/pytest-dev/pytest) from 8.3.4 to 8.3.5. - [Release
+  notes](https://github.com/pytest-dev/pytest/releases) -
+  [Changelog](https://github.com/pytest-dev/pytest/blob/main/CHANGELOG.rst) -
+  [Commits](https://github.com/pytest-dev/pytest/compare/8.3.4...8.3.5)
+
+--- updated-dependencies: - dependency-name: pytest dependency-type: direct:development
+
+update-type: version-update:semver-patch ...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+
+- **deps-dev**: Bump ruff from 0.9.9 to 0.9.10
+  ([#344](https://github.com/Python-roborock/python-roborock/pull/344),
+  [`94b281d`](https://github.com/Python-roborock/python-roborock/commit/94b281daf5906ec572fa679869eb78fab030db59))
+
+Bumps [ruff](https://github.com/astral-sh/ruff) from 0.9.9 to 0.9.10. - [Release
+  notes](https://github.com/astral-sh/ruff/releases) -
+  [Changelog](https://github.com/astral-sh/ruff/blob/main/CHANGELOG.md) -
+  [Commits](https://github.com/astral-sh/ruff/compare/0.9.9...0.9.10)
+
+--- updated-dependencies: - dependency-name: ruff dependency-type: direct:development
+
+update-type: version-update:semver-patch ...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+
+
 ## v2.12.1 (2025-03-04)
 
 ### Bug Fixes
