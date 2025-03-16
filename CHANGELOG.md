@@ -1,6 +1,18 @@
 # CHANGELOG
 
 
+## v2.13.0 (2025-03-16)
+
+### Features
+
+- Add home_data_v3 ([#347](https://github.com/Python-roborock/python-roborock/pull/347),
+  [`1325fda`](https://github.com/Python-roborock/python-roborock/commit/1325fdaef0f9d920ab499a0550da51cdb8efc0c4))
+
+* feat: add home_data_v3
+
+* fix: address comments
+
+
 ## v2.12.2 (2025-03-11)
 
 ### Bug Fixes
