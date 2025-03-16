@@ -285,7 +285,7 @@ class RoborockApiClient:
                 )
             raise RoborockException(f"{home_id_response.get('msg')} - response code: {home_id_response.get('code')}")
 
-        return home_id_response["data"].get("rrHomeId")
+        return home_id_response["data"]["rrHomeId"]
 
     async def get_home_data(self, user_data: UserData) -> HomeData:
         rriot = user_data.rriot
@@ -331,6 +331,26 @@ class RoborockApiClient:
             return HomeData.from_dict(home_data)
         else:
             raise RoborockException("home_response result was an unexpected type")
+
+    async def get_home_data_v3(self, user_data: UserData) -> HomeData:
+        """This is the same as get_home_data, but uses a different endpoint and includes non-robotic vacuums."""
+        rriot = user_data.rriot
+        home_id = await self._get_home_id(user_data)
+        if rriot.r.a is None:
+            raise RoborockException("Missing field 'a' in rriot reference")
+        home_request = PreparedRequest(
+            rriot.r.a,
+            {
+                "Authorization": self._get_hawk_authentication(rriot, "/v3/user/homes/" + home_id),
+            },
+        )
+        home_response = await home_request.request("get", "/v3/user/homes/" + home_id)
+        if not home_response.get("success"):
+            raise RoborockException(home_response)
+        home_data = home_response.get("result")
+        if isinstance(home_data, dict):
+            return HomeData.from_dict(home_data)
+        raise RoborockException(f"home_response result was an unexpected type: {home_data}")
 
     async def get_rooms(self, user_data: UserData, home_id: int | None = None) -> list[HomeDataRoom]:
         rriot = user_data.rriot
