@@ -336,6 +336,10 @@ class RoborockClientV1(RoborockClient, ABC):
             return [ServerTimer(*server_timers)]
         return []
 
+    async def load_multi_map(self, map_flag: int) -> None:
+        """Load the map into the vacuum's memory."""
+        await self.send_command(RoborockCommand.LOAD_MULTI_MAP, [map_flag])
+
     def _get_payload(
         self,
         method: RoborockCommand | str,
