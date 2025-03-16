@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.14.0 (2025-03-16)
+
+### Features
+
+- Add load_multi_map function ([#349](https://github.com/Python-roborock/python-roborock/pull/349),
+  [`23bae12`](https://github.com/Python-roborock/python-roborock/commit/23bae1225389b6ec88bad868b8c6d4a28f458e61))
+
+
 ## v2.13.0 (2025-03-16)
 
 ### Features
