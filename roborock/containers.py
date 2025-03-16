@@ -226,6 +226,7 @@ class RRiot(RoborockBase):
 
 @dataclass
 class UserData(RoborockBase):
+    rriot: RRiot
     uid: int | None = None
     tokentype: str | None = None
     token: str | None = None
@@ -234,7 +235,6 @@ class UserData(RoborockBase):
     countrycode: str | None = None
     country: str | None = None
     nickname: str | None = None
-    rriot: RRiot | None = None
     tuya_device_state: int | None = None
     avatarurl: str | None = None
 
