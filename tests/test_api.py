@@ -4,7 +4,7 @@ import logging
 from collections.abc import AsyncGenerator
 from queue import Queue
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import paho.mqtt.client as mqtt
 import pytest
@@ -36,7 +36,7 @@ from . import mqtt_packet
 
 
 def test_can_create_prepared_request():
-    PreparedRequest("https://sample.com")
+    PreparedRequest("https://sample.com", AsyncMock())
 
 
 async def test_can_create_mqtt_roborock():
