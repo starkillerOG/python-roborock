@@ -30,16 +30,19 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RoborockApiClient:
-    def __init__(self, username: str, base_url=None) -> None:
+    def __init__(self, username: str, base_url=None, session: aiohttp.ClientSession | None = None) -> None:
         """Sample API Client."""
         self._username = username
         self._default_url = "https://euiot.roborock.com"
         self.base_url = base_url
         self._device_identifier = secrets.token_urlsafe(16)
+        if session is None:
+            session = aiohttp.ClientSession()
+        self.session = session
 
     async def _get_base_url(self) -> str:
         if not self.base_url:
-            url_request = PreparedRequest(self._default_url)
+            url_request = PreparedRequest(self._default_url, self.session)
             response = await url_request.request(
                 "post",
                 "/api/v1/getUrlByEmail",
@@ -113,7 +116,7 @@ class RoborockApiClient:
         ):
             raise RoborockException("Your userdata is missing critical attributes.")
         base_url = user_data.rriot.r.a
-        prepare_request = PreparedRequest(base_url)
+        prepare_request = PreparedRequest(base_url, self.session)
         hid = await self._get_home_id(user_data)
 
         data = FormData()
@@ -151,7 +154,7 @@ class RoborockApiClient:
         ):
             raise RoborockException("Your userdata is missing critical attributes.")
         base_url = user_data.rriot.r.a
-        add_device_request = PreparedRequest(base_url)
+        add_device_request = PreparedRequest(base_url, self.session)
 
         add_device_response = await add_device_request.request(
             "GET",
@@ -176,7 +179,7 @@ class RoborockApiClient:
     async def request_code(self) -> None:
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
-        code_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
+        code_request = PreparedRequest(base_url, self.session, {"header_clientid": header_clientid})
 
         code_response = await code_request.request(
             "post",
@@ -201,7 +204,7 @@ class RoborockApiClient:
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
 
-        login_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
+        login_request = PreparedRequest(base_url, self.session, {"header_clientid": header_clientid})
         login_response = await login_request.request(
             "post",
             "/api/v1/login",
@@ -239,7 +242,7 @@ class RoborockApiClient:
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
 
-        login_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
+        login_request = PreparedRequest(base_url, self.session, {"header_clientid": header_clientid})
         login_response = await login_request.request(
             "post",
             "/api/v1/loginWithCode",
@@ -270,7 +273,7 @@ class RoborockApiClient:
     async def _get_home_id(self, user_data: UserData):
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
-        home_id_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
+        home_id_request = PreparedRequest(base_url, self.session, {"header_clientid": header_clientid})
         home_id_response = await home_id_request.request(
             "get",
             "/api/v1/getHomeDetail",
@@ -296,6 +299,7 @@ class RoborockApiClient:
             raise RoborockException("Missing field 'a' in rriot reference")
         home_request = PreparedRequest(
             rriot.r.a,
+            self.session,
             {
                 "Authorization": self._get_hawk_authentication(rriot, f"/user/homes/{str(home_id)}"),
             },
@@ -319,6 +323,7 @@ class RoborockApiClient:
             raise RoborockException("Missing field 'a' in rriot reference")
         home_request = PreparedRequest(
             rriot.r.a,
+            self.session,
             {
                 "Authorization": self._get_hawk_authentication(rriot, "/v2/user/homes/" + str(home_id)),
             },
@@ -362,6 +367,7 @@ class RoborockApiClient:
             raise RoborockException("Missing field 'a' in rriot reference")
         room_request = PreparedRequest(
             rriot.r.a,
+            self.session,
             {
                 "Authorization": self._get_hawk_authentication(rriot, "/v2/user/homes/" + str(home_id)),
             },
@@ -386,6 +392,7 @@ class RoborockApiClient:
             raise RoborockException("Missing field 'a' in rriot reference")
         scenes_request = PreparedRequest(
             rriot.r.a,
+            self.session,
             {
                 "Authorization": self._get_hawk_authentication(rriot, f"/user/scene/device/{str(device_id)}"),
             },
@@ -407,6 +414,7 @@ class RoborockApiClient:
             raise RoborockException("Missing field 'a' in rriot reference")
         execute_scene_request = PreparedRequest(
             rriot.r.a,
+            self.session,
             {
                 "Authorization": self._get_hawk_authentication(rriot, f"/user/scene/{str(scene_id)}/execute"),
             },
@@ -419,7 +427,7 @@ class RoborockApiClient:
         """Gets all products and their schemas, good for determining status codes and model numbers."""
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
-        product_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
+        product_request = PreparedRequest(base_url, self.session, {"header_clientid": header_clientid})
         product_response = await product_request.request(
             "get",
             "/api/v4/product",
@@ -437,7 +445,7 @@ class RoborockApiClient:
     async def download_code(self, user_data: UserData, product_id: int):
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
-        product_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
+        product_request = PreparedRequest(base_url, self.session, {"header_clientid": header_clientid})
         request = {"apilevel": 99999, "productids": [product_id], "type": 2}
         response = await product_request.request(
             "post",
@@ -450,7 +458,7 @@ class RoborockApiClient:
     async def download_category_code(self, user_data: UserData):
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
-        product_request = PreparedRequest(base_url, {"header_clientid": header_clientid})
+        product_request = PreparedRequest(base_url, self.session, {"header_clientid": header_clientid})
         response = await product_request.request(
             "get",
             "api/v1/plugins?apiLevel=99999&type=2",
@@ -462,25 +470,27 @@ class RoborockApiClient:
 
 
 class PreparedRequest:
-    def __init__(self, base_url: str, base_headers: dict | None = None) -> None:
+    def __init__(self, base_url: str, session: aiohttp.ClientSession, base_headers: dict | None = None) -> None:
         self.base_url = base_url
         self.base_headers = base_headers or {}
+        self.session = session
 
     async def request(self, method: str, url: str, params=None, data=None, headers=None, json=None) -> dict:
         _url = "/".join(s.strip("/") for s in [self.base_url, url])
         _headers = {**self.base_headers, **(headers or {})}
-        async with aiohttp.ClientSession() as session:
+        try:
+            async with self.session.request(
+                method, _url, params=params, data=data, headers=_headers, json=json
+            ) as resp:
+                return await resp.json()
+        except ContentTypeError as err:
+            """If we get an error, lets log everything for debugging."""
             try:
-                async with session.request(method, _url, params=params, data=data, headers=_headers, json=json) as resp:
-                    return await resp.json()
-            except ContentTypeError as err:
-                """If we get an error, lets log everything for debugging."""
-                try:
-                    resp_json = await resp.json(content_type=None)
-                    _LOGGER.info("Resp: %s", resp_json)
-                except ContentTypeError as err_2:
-                    _LOGGER.info(err_2)
-                resp_raw = await resp.read()
-                _LOGGER.info("Resp raw: %s", resp_raw)
-                # Still raise the err so that it's clear it failed.
-                raise err
+                resp_json = await resp.json(content_type=None)
+                _LOGGER.info("Resp: %s", resp_json)
+            except ContentTypeError as err_2:
+                _LOGGER.info(err_2)
+            resp_raw = await resp.read()
+            _LOGGER.info("Resp raw: %s", resp_raw)
+            # Still raise the err so that it's clear it failed.
+            raise err
