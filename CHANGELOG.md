@@ -1,6 +1,24 @@
 # CHANGELOG
 
 
+## v2.15.0 (2025-03-18)
+
+### Chores
+
+- Fix documentation links ([#348](https://github.com/Python-roborock/python-roborock/pull/348),
+  [`404a47c`](https://github.com/Python-roborock/python-roborock/commit/404a47c8c51891ed90093869e567d56386cdc4a2))
+
+### Features
+
+- Allow passing in clientsession
+  ([#354](https://github.com/Python-roborock/python-roborock/pull/354),
+  [`1d31cf6`](https://github.com/Python-roborock/python-roborock/commit/1d31cf619ef38dfdd2891cd42c0acf4550b88c29))
+
+* feat: allow passing in clientsession
+
+* fix: test
+
+
 ## v2.14.0 (2025-03-16)
 
 ### Features
