@@ -107,9 +107,9 @@ class AttributeCache:
             raise err
         return self._value
 
-    async def async_value(self):
+    async def async_value(self, force: bool = False):
         async with self._mutex:
-            if self._value is None:
+            if self._value is None or force:
                 return await self.task.reset()
             return self._value
 
@@ -175,7 +175,7 @@ class RoborockClientV1(RoborockClient, ABC):
         return self._status_type
 
     async def get_status(self) -> Status:
-        data = self._status_type.from_dict(await self.cache[CacheableAttribute.status].async_value())
+        data = self._status_type.from_dict(await self.cache[CacheableAttribute.status].async_value(force=True))
         if data is None:
             return self._status_type()
         return data
