@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.16.0 (2025-03-22)
+
+### Features
+
+- Allow forcing of updating cache variables
+  ([#355](https://github.com/Python-roborock/python-roborock/pull/355),
+  [`eae7803`](https://github.com/Python-roborock/python-roborock/commit/eae7803db8973870c396ce45341e5d38cbfaf321))
+
+
 ## v2.15.0 (2025-03-18)
 
 ### Chores
