@@ -1,3 +1,5 @@
+import aiohttp
+
 from roborock import HomeData, HomeDataScene, UserData
 from roborock.web_api import RoborockApiClient
 from tests.mock_data import HOME_DATA_RAW, USER_DATA
@@ -5,9 +7,11 @@ from tests.mock_data import HOME_DATA_RAW, USER_DATA
 
 async def test_pass_login_flow() -> None:
     """Test that we can login with a password and we get back the correct userdata object."""
-    api = RoborockApiClient(username="test_user@gmail.com")
+    my_session = aiohttp.ClientSession()
+    api = RoborockApiClient(username="test_user@gmail.com", session=my_session)
     ud = await api.pass_login("password")
     assert ud == UserData.from_dict(USER_DATA)
+    assert not my_session.closed
 
 
 async def test_code_login_flow() -> None:
