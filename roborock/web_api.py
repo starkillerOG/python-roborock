@@ -36,8 +36,6 @@ class RoborockApiClient:
         self._default_url = "https://euiot.roborock.com"
         self.base_url = base_url
         self._device_identifier = secrets.token_urlsafe(16)
-        if session is None:
-            session = aiohttp.ClientSession()
         self.session = session
 
     async def _get_base_url(self) -> str:
@@ -470,7 +468,9 @@ class RoborockApiClient:
 
 
 class PreparedRequest:
-    def __init__(self, base_url: str, session: aiohttp.ClientSession, base_headers: dict | None = None) -> None:
+    def __init__(
+        self, base_url: str, session: aiohttp.ClientSession | None = None, base_headers: dict | None = None
+    ) -> None:
         self.base_url = base_url
         self.base_headers = base_headers or {}
         self.session = session
@@ -478,10 +478,10 @@ class PreparedRequest:
     async def request(self, method: str, url: str, params=None, data=None, headers=None, json=None) -> dict:
         _url = "/".join(s.strip("/") for s in [self.base_url, url])
         _headers = {**self.base_headers, **(headers or {})}
+        close_session = self.session is None
+        session = self.session if self.session is not None else aiohttp.ClientSession()
         try:
-            async with self.session.request(
-                method, _url, params=params, data=data, headers=_headers, json=json
-            ) as resp:
+            async with session.request(method, _url, params=params, data=data, headers=_headers, json=json) as resp:
                 return await resp.json()
         except ContentTypeError as err:
             """If we get an error, lets log everything for debugging."""
@@ -494,3 +494,6 @@ class PreparedRequest:
             _LOGGER.info("Resp raw: %s", resp_raw)
             # Still raise the err so that it's clear it failed.
             raise err
+        finally:
+            if close_session:
+                await session.close()
