@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.16.1 (2025-03-22)
+
+### Bug Fixes
+
+- Close the session if we created it
+  ([#356](https://github.com/Python-roborock/python-roborock/pull/356),
+  [`96cc718`](https://github.com/Python-roborock/python-roborock/commit/96cc718dbd4106fa344172e2dbf0c3779344ba04))
+
+
 ## v2.16.0 (2025-03-22)
 
 ### Features
