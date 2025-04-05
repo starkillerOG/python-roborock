@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.17.0 (2025-04-05)
+
+### Features
+
+- Add support for g20s ultra ([#359](https://github.com/Python-roborock/python-roborock/pull/359),
+  [`593c368`](https://github.com/Python-roborock/python-roborock/commit/593c3687064779ee6790e17f40411cd8129b756e))
+
+
 ## v2.16.1 (2025-03-22)
 
 ### Bug Fixes
