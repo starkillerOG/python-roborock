@@ -72,3 +72,7 @@ class RoborockMissingParameters(RoborockException):
 
 class RoborockTooManyRequest(RoborockException):
     """Class for Roborock too many request exceptions."""
+
+
+class RoborockRateLimit(RoborockException):
+    """Class for our rate limits exceptions."""

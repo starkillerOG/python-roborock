@@ -264,6 +264,16 @@ def mock_rest() -> aioresponses:
         yield mocked
 
 
+@pytest.fixture(autouse=True)
+def skip_rate_limit():
+    """Don't rate limit tests as they aren't actually hitting the api."""
+    with (
+        patch("roborock.web_api.RoborockApiClient._login_limiter.try_acquire"),
+        patch("roborock.web_api.RoborockApiClient._home_data_limiter.try_acquire"),
+    ):
+        yield
+
+
 @pytest.fixture(name="mock_create_local_connection")
 def create_local_connection_fixture(request_handler: RequestHandler) -> Generator[None, None, None]:
     """Fixture that overrides the transport creation to wire it up to the mock socket."""

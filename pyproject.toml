@@ -30,6 +30,7 @@ pycryptodomex = {version = "^3.18", markers = "sys_platform == 'darwin'"}
 paho-mqtt = ">=1.6.1,<3.0.0"
 construct = "^2.10.57"
 vacuum-map-parser-roborock = "*"
+pyrate-limiter = "^3.7.0"
 
 
 [build-system]
