@@ -10,6 +10,7 @@ import time
 
 import aiohttp
 from aiohttp import ContentTypeError, FormData
+from pyrate_limiter import BucketFullException, Duration, Limiter, Rate
 
 from roborock.containers import HomeData, HomeDataRoom, HomeDataScene, ProductResponse, RRiot, UserData
 from roborock.exceptions import (
@@ -21,6 +22,7 @@ from roborock.exceptions import (
     RoborockInvalidUserAgreement,
     RoborockMissingParameters,
     RoborockNoUserAgreement,
+    RoborockRateLimit,
     RoborockTooFrequentCodeRequests,
     RoborockTooManyRequest,
     RoborockUrlException,
@@ -30,6 +32,22 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RoborockApiClient:
+    _LOGIN_RATES = [
+        Rate(1, Duration.SECOND),
+        Rate(3, Duration.MINUTE),
+        Rate(10, Duration.HOUR),  # 10 requests per hour
+        Rate(20, Duration.DAY),  # 50 requests per day
+    ]
+    _HOME_DATA_RATES = [
+        Rate(1, Duration.SECOND),
+        Rate(5, Duration.MINUTE),
+        Rate(15, Duration.HOUR),  # 20 requests per hour
+        Rate(40, Duration.DAY),  # 75 requests per day
+    ]
+
+    _login_limiter = Limiter(_LOGIN_RATES)
+    _home_data_limiter = Limiter(_HOME_DATA_RATES)
+
     def __init__(self, username: str, base_url=None, session: aiohttp.ClientSession | None = None) -> None:
         """Sample API Client."""
         self._username = username
@@ -175,6 +193,11 @@ class RoborockApiClient:
         return add_device_response["result"]
 
     async def request_code(self) -> None:
+        try:
+            self._login_limiter.try_acquire("login")
+        except BucketFullException as ex:
+            _LOGGER.info(ex.meta_info)
+            raise RoborockRateLimit("Reached maximum requests for login. Please try again later.") from ex
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
         code_request = PreparedRequest(base_url, self.session, {"header_clientid": header_clientid})
@@ -199,6 +222,11 @@ class RoborockApiClient:
                 raise RoborockException(f"{code_response.get('msg')} - response code: {code_response.get('code')}")
 
     async def pass_login(self, password: str) -> UserData:
+        try:
+            self._login_limiter.try_acquire("login")
+        except BucketFullException as ex:
+            _LOGGER.info(ex.meta_info)
+            raise RoborockRateLimit("Reached maximum requests for login. Please try again later.") from ex
         base_url = await self._get_base_url()
         header_clientid = self._get_header_client_id()
 
@@ -289,6 +317,11 @@ class RoborockApiClient:
         return home_id_response["data"]["rrHomeId"]
 
     async def get_home_data(self, user_data: UserData) -> HomeData:
+        try:
+            self._home_data_limiter.try_acquire("home_data")
+        except BucketFullException as ex:
+            _LOGGER.info(ex.meta_info)
+            raise RoborockRateLimit("Reached maximum requests for home data. Please try again later.") from ex
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("rriot is none")
@@ -313,6 +346,11 @@ class RoborockApiClient:
 
     async def get_home_data_v2(self, user_data: UserData) -> HomeData:
         """This is the same as get_home_data, but uses a different endpoint and includes non-robotic vacuums."""
+        try:
+            self._home_data_limiter.try_acquire("home_data")
+        except BucketFullException as ex:
+            _LOGGER.info(ex.meta_info)
+            raise RoborockRateLimit("Reached maximum requests for home data. Please try again later.") from ex
         rriot = user_data.rriot
         if rriot is None:
             raise RoborockException("rriot is none")
@@ -337,6 +375,11 @@ class RoborockApiClient:
 
     async def get_home_data_v3(self, user_data: UserData) -> HomeData:
         """This is the same as get_home_data, but uses a different endpoint and includes non-robotic vacuums."""
+        try:
+            self._home_data_limiter.try_acquire("home_data")
+        except BucketFullException as ex:
+            _LOGGER.info(ex.meta_info)
+            raise RoborockRateLimit("Reached maximum requests for home data. Please try again later.") from ex
         rriot = user_data.rriot
         home_id = await self._get_home_id(user_data)
         if rriot.r.a is None:
@@ -344,10 +387,10 @@ class RoborockApiClient:
         home_request = PreparedRequest(
             rriot.r.a,
             {
-                "Authorization": self._get_hawk_authentication(rriot, "/v3/user/homes/" + home_id),
+                "Authorization": self._get_hawk_authentication(rriot, "/v3/user/homes/" + str(home_id)),
             },
         )
-        home_response = await home_request.request("get", "/v3/user/homes/" + home_id)
+        home_response = await home_request.request("get", "/v3/user/homes/" + str(home_id))
         if not home_response.get("success"):
             raise RoborockException(home_response)
         home_data = home_response.get("result")
