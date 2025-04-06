@@ -33,16 +33,16 @@ _LOGGER = logging.getLogger(__name__)
 
 class RoborockApiClient:
     _LOGIN_RATES = [
-        Rate(1, Duration.SECOND),
-        Rate(3, Duration.MINUTE),
+        Rate(1, Duration.SECOND),  # 1 requests per hour
+        Rate(3, Duration.MINUTE),  # 3 requests per hour
         Rate(10, Duration.HOUR),  # 10 requests per hour
-        Rate(20, Duration.DAY),  # 50 requests per day
+        Rate(20, Duration.DAY),  # 20 requests per day
     ]
     _HOME_DATA_RATES = [
-        Rate(1, Duration.SECOND),
-        Rate(5, Duration.MINUTE),
-        Rate(15, Duration.HOUR),  # 20 requests per hour
-        Rate(40, Duration.DAY),  # 75 requests per day
+        Rate(1, Duration.SECOND),  # 1 requests per hour
+        Rate(5, Duration.MINUTE),  # 5 requests per hour
+        Rate(15, Duration.HOUR),  # 15 requests per hour
+        Rate(40, Duration.DAY),  # 40 requests per day
     ]
 
     _login_limiter = Limiter(_LOGIN_RATES)
