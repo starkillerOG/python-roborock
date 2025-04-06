@@ -1,6 +1,21 @@
 # CHANGELOG
 
 
+## v2.18.0 (2025-04-06)
+
+### Features
+
+- Rate limits for login and home data
+  ([#361](https://github.com/Python-roborock/python-roborock/pull/361),
+  [`93ef8ad`](https://github.com/Python-roborock/python-roborock/commit/93ef8addfd2faa6264606c9d710c46772cd52150))
+
+* feat: rate limits for login and home data
+
+* fix: comments
+
+* fix: testing and comments
+
+
 ## v2.17.0 (2025-04-05)
 
 ### Features
