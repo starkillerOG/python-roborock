@@ -33,16 +33,16 @@ _LOGGER = logging.getLogger(__name__)
 
 class RoborockApiClient:
     _LOGIN_RATES = [
-        Rate(1, Duration.SECOND),  # 1 requests per hour
-        Rate(3, Duration.MINUTE),  # 3 requests per hour
-        Rate(10, Duration.HOUR),  # 10 requests per hour
-        Rate(20, Duration.DAY),  # 20 requests per day
+        Rate(1, Duration.SECOND),
+        Rate(3, Duration.MINUTE),
+        Rate(10, Duration.HOUR),
+        Rate(20, Duration.DAY),
     ]
     _HOME_DATA_RATES = [
-        Rate(1, Duration.SECOND),  # 1 requests per hour
-        Rate(5, Duration.MINUTE),  # 5 requests per hour
-        Rate(15, Duration.HOUR),  # 15 requests per hour
-        Rate(40, Duration.DAY),  # 40 requests per day
+        Rate(1, Duration.SECOND),
+        Rate(5, Duration.MINUTE),
+        Rate(15, Duration.HOUR),
+        Rate(40, Duration.DAY),
     ]
 
     _login_limiter = Limiter(_LOGIN_RATES)
@@ -387,10 +387,10 @@ class RoborockApiClient:
         home_request = PreparedRequest(
             rriot.r.a,
             {
-                "Authorization": self._get_hawk_authentication(rriot, "/v3/user/homes/" + str(home_id)),
+                "Authorization": self._get_hawk_authentication(rriot, "/v3/user/homes/" + home_id),
             },
         )
-        home_response = await home_request.request("get", "/v3/user/homes/" + str(home_id))
+        home_response = await home_request.request("get", "/v3/user/homes/" + home_id)
         if not home_response.get("success"):
             raise RoborockException(home_response)
         home_data = home_response.get("result")
