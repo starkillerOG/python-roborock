@@ -6,7 +6,8 @@ import secrets
 import time
 
 from . import RoborockCommand
-from .containers import DeviceData, UserData
+from .containers import DeviceData, ModelStatus, S7MaxVStatus, Status, UserData
+from .device_trait import ConsumableTrait, DeviceTrait, DndTrait
 from .mqtt_manager import RoborockMqttManager
 from .protocol import MessageParser, Utils
 from .roborock_message import RoborockMessage, RoborockMessageProtocol
@@ -25,26 +26,25 @@ class RoborockDevice:
         self._local_endpoint = "abc"
         self._nonce = secrets.token_bytes(16)
         self.manager = RoborockMqttManager()
-        self.update_commands = self.determine_supported_commands()
+        self._message_id_types: dict[int, DeviceTrait] = {}
+        self._command_to_trait = {}
+        self._all_supported_traits = []
+        self._dnd_trait: DndTrait | None = self.determine_supported_traits(DndTrait)
+        self._consumable_trait: ConsumableTrait | None = self.determine_supported_traits(ConsumableTrait)
+        self._status_type: type[Status] = ModelStatus.get(device_info.model, S7MaxVStatus)
 
-    def determine_supported_commands(self):
-        # All devices support these
-        supported_commands = {
-            RoborockCommand.GET_CONSUMABLE,
-            RoborockCommand.GET_STATUS,
-            RoborockCommand.GET_CLEAN_SUMMARY,
-        }
-        # Get what features we can from the feature_set info.
+    def determine_supported_traits(self, trait: type[DeviceTrait]):
+        def _send_command(
+            method: RoborockCommand | str, params: list | dict | int | None = None, use_cloud: bool = True
+        ):
+            return self.send_message(method, params, use_cloud)
 
-        # If a command is not described in feature_set, we should just add it anyways and then let it fail on the first call and remove it.
-        robot_new_features = int(self.device_info.device.feature_set)
-        new_feature_info_str = self.device_info.device.new_feature_set
-        if 33554432 & int(robot_new_features):
-            supported_commands.add(RoborockCommand.GET_DUST_COLLECTION_MODE)
-        if 2 & int(new_feature_info_str[-8:], 16):
-            # TODO: May not be needed as i think this can just be found in Status, but just POC
-            supported_commands.add(RoborockCommand.APP_GET_CLEAN_ESTIMATE_INFO)
-        return supported_commands
+        if trait.supported(self.device_info.device_features):
+            trait_instance = trait(_send_command)
+            self._all_supported_traits.append(trait(_send_command))
+            self._command_to_trait[trait.handle_command] = trait_instance
+            return trait_instance
+        return None
 
     async def connect(self):
         """Connect via MQTT and Local if possible."""
@@ -52,8 +52,8 @@ class RoborockDevice:
         await self.update()
 
     async def update(self):
-        for cmd in self.update_commands:
-            await self.send_message(method=cmd)
+        for trait in self._all_supported_traits:
+            await trait.get()
 
     def _get_payload(
         self,
@@ -91,7 +91,9 @@ class RoborockDevice:
         request_id, timestamp, payload = self._get_payload(method, params, True, use_cloud)
         request_protocol = RoborockMessageProtocol.RPC_REQUEST
         roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
-
+        if request_id in self._message_id_types:
+            raise Exception("Duplicate id!")
+        self._message_id_types[request_id] = self._command_to_trait[method]
         local_key = self.device_info.device.local_key
         msg = MessageParser.build(roborock_message, local_key, False)
         if use_cloud:
@@ -101,6 +103,19 @@ class RoborockDevice:
             pass
 
     def on_message(self, message: RoborockMessage):
+        message_payload = message.get_payload()
+        message_id = message.get_request_id()
+        for data_point_number, data_point in message_payload.get("dps").items():
+            if data_point_number == "102":
+                data_point_response = json.loads(data_point)
+                result = data_point_response.get("result")
+                if isinstance(result, list) and len(result) == 1:
+                    result = result[0]
+                if result and (trait := self._message_id_types.get(message_id)) is not None:
+                    trait.on_message(result)
+                if (error := result.get("error")) is not None:
+                    print(error)
+        print()
         # If message is command not supported - remove from self.update_commands
 
         # If message is an error - log it?
@@ -115,3 +130,11 @@ class RoborockDevice:
 
         # This should also probably be split with on_cloud_message and on_local_message.
         print(message)
+
+    @property
+    def dnd(self) -> DndTrait | None:
+        return self._dnd_trait
+
+    @property
+    def consumable(self) -> ConsumableTrait | None:
+        return self._consumable_trait

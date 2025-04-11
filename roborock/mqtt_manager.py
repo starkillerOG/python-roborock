@@ -89,7 +89,8 @@ class RoborockMqttManager:
                     device_id = message.topic.value.split("/")[-1]
                     device = device_map[device_id]
                     message = MessageParser.parse(message.payload, device.device.local_key)
-                    callbacks[device_id](message)
+                    for m in message[0]:
+                        callbacks[device_id](m)
                 except Exception:
                     ...
 
