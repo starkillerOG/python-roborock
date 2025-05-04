@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.18.1 (2025-05-04)
+
+### Bug Fixes
+
+- Get home_data_v3 working ([#371](https://github.com/Python-roborock/python-roborock/pull/371),
+  [`f9e6c54`](https://github.com/Python-roborock/python-roborock/commit/f9e6c546e68a71a321dafabd5d502abef3e89b31))
+
+
 ## v2.18.0 (2025-04-06)
 
 ### Features
