@@ -386,6 +386,7 @@ class RoborockApiClient:
             raise RoborockException("Missing field 'a' in rriot reference")
         home_request = PreparedRequest(
             rriot.r.a,
+            self.session,
             {
                 "Authorization": self._get_hawk_authentication(rriot, "/v3/user/homes/" + str(home_id)),
             },
