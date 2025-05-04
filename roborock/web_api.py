@@ -387,10 +387,10 @@ class RoborockApiClient:
         home_request = PreparedRequest(
             rriot.r.a,
             {
-                "Authorization": self._get_hawk_authentication(rriot, "/v3/user/homes/" + home_id),
+                "Authorization": self._get_hawk_authentication(rriot, "/v3/user/homes/" + str(home_id)),
             },
         )
-        home_response = await home_request.request("get", "/v3/user/homes/" + home_id)
+        home_response = await home_request.request("get", "/v3/user/homes/" + str(home_id))
         if not home_response.get("success"):
             raise RoborockException(home_response)
         home_data = home_response.get("result")
