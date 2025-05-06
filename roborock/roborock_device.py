@@ -4,12 +4,13 @@ import logging
 import math
 import secrets
 import time
+from urllib.parse import urlparse
 
 from . import RoborockCommand
 from .containers import DeviceData, ModelStatus, S7MaxVStatus, Status, UserData
 from .device_trait import ConsumableTrait, DeviceTrait, DndTrait
-from .mqtt_manager import RoborockMqttManager
-from .protocol import MessageParser, Utils
+from .mqtt.roborock_session import MqttParams, RoborockMqttSession
+from .protocol import MessageParser, Utils, md5hex
 from .roborock_message import RoborockMessage, RoborockMessageProtocol
 from .util import RoborockLoggerAdapter, get_next_int
 
@@ -17,15 +18,25 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RoborockDevice:
+    _mqtt_sessions: dict[str, RoborockMqttSession] = {}
+
     def __init__(self, user_data: UserData, device_info: DeviceData):
         self.user_data = user_data
         self.device_info = device_info
         self.data = None
         self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
         self._mqtt_endpoint = base64.b64encode(Utils.md5(user_data.rriot.k.encode())[8:14]).decode()
+        rriot = user_data.rriot
+        self._mqtt_user = rriot.u
+        self._hashed_user = md5hex(self._mqtt_user + ":" + rriot.k)[2:10]
+        url = urlparse(rriot.r.m)
+        self._mqtt_host = str(url)
+        self._mqtt_port = url.port
+        mqtt_password = rriot.s
+        self._hashed_password = md5hex(mqtt_password + ":" + rriot.k)[16:]
+
         self._local_endpoint = "abc"
         self._nonce = secrets.token_bytes(16)
-        self.manager = RoborockMqttManager()
         self._message_id_types: dict[int, DeviceTrait] = {}
         self._command_to_trait = {}
         self._all_supported_traits = []
@@ -48,6 +59,14 @@ class RoborockDevice:
 
     async def connect(self):
         """Connect via MQTT and Local if possible."""
+
+        MqttParams(
+            host=self._mqtt_host,
+            port=self._mqtt_port,
+            tls=True,
+            username=self._hashed_user,
+            password=self._hashed_password,
+        )
         await self.manager.subscribe(self.user_data, self.device_info, self.on_message)
         await self.update()
 
@@ -93,7 +112,8 @@ class RoborockDevice:
         roborock_message = RoborockMessage(timestamp=timestamp, protocol=request_protocol, payload=payload)
         if request_id in self._message_id_types:
             raise Exception("Duplicate id!")
-        self._message_id_types[request_id] = self._command_to_trait[method]
+        if method in self._command_to_trait:
+            self._message_id_types[request_id] = self._command_to_trait[method]
         local_key = self.device_info.device.local_key
         msg = MessageParser.build(roborock_message, local_key, False)
         if use_cloud:

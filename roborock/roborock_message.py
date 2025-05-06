@@ -169,7 +169,8 @@ class RoborockMessage:
         return self._parsed_payload
 
     def get_request_id(self) -> int | None:
-        if self._parsed_payload:
+        payload = self.get_payload()
+        if payload:
             for data_point_number, data_point in self._parsed_payload.get("dps").items():
                 if data_point_number in ["101", "102"]:
                     data_point_response = json.loads(data_point)
@@ -185,7 +186,8 @@ class RoborockMessage:
         if self.message_retry:
             return self.message_retry.method
         protocol = self.protocol
-        if self._parsed_payload and protocol in [4, 5, 101, 102]:
+        payload = self.get_payload()
+        if payload and protocol in [4, 5, 101, 102]:
             for data_point_number, data_point in self._parsed_payload.get("dps").items():
                 if data_point_number in ["101", "102"]:
                     data_point_response = json.loads(data_point)
@@ -194,7 +196,8 @@ class RoborockMessage:
 
     def get_params(self) -> list | dict | None:
         protocol = self.protocol
-        if self._parsed_payload and protocol in [4, 101, 102]:
+        payload = self.get_payload()
+        if payload and protocol in [4, 101, 102]:
             for data_point_number, data_point in self._parsed_payload.get("dps").items():
                 if data_point_number in ["101", "102"]:
                     data_point_response = json.loads(data_point)
