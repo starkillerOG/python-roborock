@@ -1,6 +1,22 @@
 # CHANGELOG
 
 
+## v2.18.2 (2025-05-04)
+
+### Bug Fixes
+
+- Add session to home_data_v3 ([#372](https://github.com/Python-roborock/python-roborock/pull/372),
+  [`77061fe`](https://github.com/Python-roborock/python-roborock/commit/77061fe1545a3d2f9e874a3f7e4a94eedfd17706))
+
+
+## v2.18.1 (2025-05-04)
+
+### Bug Fixes
+
+- Get home_data_v3 working ([#371](https://github.com/Python-roborock/python-roborock/pull/371),
+  [`f9e6c54`](https://github.com/Python-roborock/python-roborock/commit/f9e6c546e68a71a321dafabd5d502abef3e89b31))
+
+
 ## v2.18.0 (2025-04-06)
 
 ### Features

@@ -68,11 +68,12 @@ class RoborockApiClient:
                 raise RoborockUrlException("get url by email returned None")
             response_code = response.get("code")
             if response_code != 200:
+                _LOGGER.info("Get base url failed for %s with the following context: %s", self._username, response)
                 if response_code == 2003:
                     raise RoborockInvalidEmail("Your email was incorrectly formatted.")
                 elif response_code == 1001:
                     raise RoborockMissingParameters(
-                        "You are missing parameters for this request, are you sure you " "entered your username?"
+                        "You are missing parameters for this request, are you sure you entered your username?"
                     )
                 elif response_code == 9002:
                     raise RoborockTooManyRequest("Please temporarily disable making requests and try again later.")
@@ -214,6 +215,7 @@ class RoborockApiClient:
             raise RoborockException("Failed to get a response from send email code")
         response_code = code_response.get("code")
         if response_code != 200:
+            _LOGGER.info("Request code failed for %s with the following context: %s", self._username, code_response)
             if response_code == 2008:
                 raise RoborockAccountDoesNotExist("Account does not exist - check your login and try again.")
             elif response_code == 9002:
@@ -243,6 +245,7 @@ class RoborockApiClient:
         if login_response is None:
             raise RoborockException("Login response is none")
         if login_response.get("code") != 200:
+            _LOGGER.info("Login failed for %s with the following context: %s", self._username, login_response)
             raise RoborockException(f"{login_response.get('msg')} - response code: {login_response.get('code')}")
         user_data = login_response.get("data")
         if not isinstance(user_data, dict):
@@ -282,6 +285,7 @@ class RoborockApiClient:
             raise RoborockException("Login request response is None")
         response_code = login_response.get("code")
         if response_code != 200:
+            _LOGGER.info("Login failed for %s with the following context: %s", self._username, login_response)
             if response_code == 2018:
                 raise RoborockInvalidCode("Invalid code - check your code and try again.")
             if response_code == 3009:
@@ -308,6 +312,7 @@ class RoborockApiClient:
         if home_id_response is None:
             raise RoborockException("home_id_response is None")
         if home_id_response.get("code") != 200:
+            _LOGGER.info("Get Home Id failed with the following context: %s", home_id_response)
             if home_id_response.get("code") == 2010:
                 raise RoborockInvalidCredentials(
                     f"Invalid credentials ({home_id_response.get('msg')}) - check your login and try again."
@@ -386,11 +391,12 @@ class RoborockApiClient:
             raise RoborockException("Missing field 'a' in rriot reference")
         home_request = PreparedRequest(
             rriot.r.a,
+            self.session,
             {
-                "Authorization": self._get_hawk_authentication(rriot, "/v3/user/homes/" + home_id),
+                "Authorization": self._get_hawk_authentication(rriot, "/v3/user/homes/" + str(home_id)),
             },
         )
-        home_response = await home_request.request("get", "/v3/user/homes/" + home_id)
+        home_response = await home_request.request("get", "/v3/user/homes/" + str(home_id))
         if not home_response.get("success"):
             raise RoborockException(home_response)
         home_data = home_response.get("result")
