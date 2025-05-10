@@ -27,13 +27,9 @@ class RoborockDevice:
         self._logger = RoborockLoggerAdapter(device_info.device.name, _LOGGER)
         self._mqtt_endpoint = base64.b64encode(Utils.md5(user_data.rriot.k.encode())[8:14]).decode()
         rriot = user_data.rriot
-        self._mqtt_user = rriot.u
-        self._hashed_user = md5hex(self._mqtt_user + ":" + rriot.k)[2:10]
+        hashed_user = md5hex(rriot.u + ":" + rriot.k)[2:10]
         url = urlparse(rriot.r.m)
-        self._mqtt_host = str(url)
-        self._mqtt_port = url.port
         mqtt_password = rriot.s
-        self._hashed_password = md5hex(mqtt_password + ":" + rriot.k)[16:]
 
         self._local_endpoint = "abc"
         self._nonce = secrets.token_bytes(16)
@@ -43,6 +39,18 @@ class RoborockDevice:
         self._dnd_trait: DndTrait | None = self.determine_supported_traits(DndTrait)
         self._consumable_trait: ConsumableTrait | None = self.determine_supported_traits(ConsumableTrait)
         self._status_type: type[Status] = ModelStatus.get(device_info.model, S7MaxVStatus)
+        # TODO: One per client EVER
+        self.session = RoborockMqttSession(
+            MqttParams(
+                host=str(url.hostname),
+                port=url.port,
+                tls=True,
+                username=hashed_user,
+                password=md5hex(rriot.s + ":" + rriot.k)[16:],
+            )
+        )
+        self.input_topic = f"rr/m/i/{rriot.u}/{hashed_user}/{device_info.duid}"
+        self.output_topic = f"rr/m/o/{rriot.u}/{hashed_user}/{device_info.duid}"
 
     def determine_supported_traits(self, trait: type[DeviceTrait]):
         def _send_command(
@@ -59,16 +67,9 @@ class RoborockDevice:
 
     async def connect(self):
         """Connect via MQTT and Local if possible."""
-
-        MqttParams(
-            host=self._mqtt_host,
-            port=self._mqtt_port,
-            tls=True,
-            username=self._hashed_user,
-            password=self._hashed_password,
-        )
-        await self.manager.subscribe(self.user_data, self.device_info, self.on_message)
-        await self.update()
+        if not self.session.connected:
+            await self.session.start()
+            await self.session.subscribe(self.output_topic, callback=self.on_message)
 
     async def update(self):
         for trait in self._all_supported_traits:
@@ -117,39 +118,41 @@ class RoborockDevice:
         local_key = self.device_info.device.local_key
         msg = MessageParser.build(roborock_message, local_key, False)
         if use_cloud:
-            await self.manager.publish(self.user_data, self.device_info, msg)
+            await self.session.publish(self.input_topic, msg)
         else:
             # Handle doing local commands
             pass
 
-    def on_message(self, message: RoborockMessage):
-        message_payload = message.get_payload()
-        message_id = message.get_request_id()
-        for data_point_number, data_point in message_payload.get("dps").items():
-            if data_point_number == "102":
-                data_point_response = json.loads(data_point)
-                result = data_point_response.get("result")
-                if isinstance(result, list) and len(result) == 1:
-                    result = result[0]
-                if result and (trait := self._message_id_types.get(message_id)) is not None:
-                    trait.on_message(result)
-                if (error := result.get("error")) is not None:
-                    print(error)
-        print()
-        # If message is command not supported - remove from self.update_commands
+    def on_message(self, message_bytes: bytes):
+        messages = MessageParser.parse(message_bytes, self.device_info.device.local_key)[0]
+        for message in messages:
+            message_payload = message.get_payload()
+            message_id = message.get_request_id()
+            for data_point_number, data_point in message_payload.get("dps").items():
+                if data_point_number == "102":
+                    data_point_response = json.loads(data_point)
+                    result = data_point_response.get("result")
+                    if isinstance(result, list) and len(result) == 1:
+                        result = result[0]
+                    if result and (trait := self._message_id_types.get(message_id)) is not None:
+                        trait.on_message(result)
+                    if (error := result.get("error")) is not None:
+                        print(error)
+            print()
+            # If message is command not supported - remove from self.update_commands
 
-        # If message is an error - log it?
+            # If message is an error - log it?
 
-        # If message is 'ok' - ignore it
+            # If message is 'ok' - ignore it
 
-        # If message is anything else - store ids, and map back to id to determine message type.
-        # Then update self.data
+            # If message is anything else - store ids, and map back to id to determine message type.
+            # Then update self.data
 
-        # If we haven't received a message in X seconds, the device is likely offline. I think we can continue the connection,
-        # but we should have some way to mark ourselves as unavailable.
+            # If we haven't received a message in X seconds, the device is likely offline. I think we can continue the connection,
+            # but we should have some way to mark ourselves as unavailable.
 
-        # This should also probably be split with on_cloud_message and on_local_message.
-        print(message)
+            # This should also probably be split with on_cloud_message and on_local_message.
+            print(message)
 
     @property
     def dnd(self) -> DndTrait | None:

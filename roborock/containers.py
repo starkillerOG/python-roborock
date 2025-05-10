@@ -1049,6 +1049,11 @@ class DeviceData(RoborockBase):
             self.product_nickname,
         )
 
+    @property
+    def duid(self) -> str:
+        """Get the duid of the device."""
+        return self.device.duid
+
 
 @dataclass
 class RoomMapping(RoborockBase):
