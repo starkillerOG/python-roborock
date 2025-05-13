@@ -1,6 +1,41 @@
 # CHANGELOG
 
 
+## v2.19.0 (2025-05-13)
+
+### Bug Fixes
+
+- Add Saros 10 dock type code ([#362](https://github.com/Python-roborock/python-roborock/pull/362),
+  [`240bf59`](https://github.com/Python-roborock/python-roborock/commit/240bf59df1873e85e05356496e5be01f1a000199))
+
+### Chores
+
+- **deps**: Bump aiomqtt from 2.3.2 to 2.4.0
+  ([#375](https://github.com/Python-roborock/python-roborock/pull/375),
+  [`b243a25`](https://github.com/Python-roborock/python-roborock/commit/b243a25569c2cb6b54e6c0e1eed6dadecb9ad84c))
+
+Bumps [aiomqtt](https://github.com/empicano/aiomqtt) from 2.3.2 to 2.4.0. - [Release
+  notes](https://github.com/empicano/aiomqtt/releases) -
+  [Changelog](https://github.com/empicano/aiomqtt/blob/main/CHANGELOG.md) -
+  [Commits](https://github.com/empicano/aiomqtt/compare/v2.3.2...v2.4.0)
+
+--- updated-dependencies: - dependency-name: aiomqtt dependency-version: 2.4.0
+
+dependency-type: direct:production
+
+update-type: version-update:semver-minor ...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+
+### Features
+
+- Add some logging for the web api
+  ([#377](https://github.com/Python-roborock/python-roborock/pull/377),
+  [`74c1b5f`](https://github.com/Python-roborock/python-roborock/commit/74c1b5f6e88ce410f95676de802bd04d304963b1))
+
+
 ## v2.18.2 (2025-05-04)
 
 ### Bug Fixes
