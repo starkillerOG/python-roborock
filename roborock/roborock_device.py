@@ -8,7 +8,8 @@ from urllib.parse import urlparse
 
 from . import RoborockCommand
 from .containers import DeviceData, ModelStatus, S7MaxVStatus, Status, UserData
-from .device_trait import ConsumableTrait, DeviceTrait, DndTrait
+from .device_trait import DeviceTrait
+from .device_traits import Dnd
 from .mqtt.roborock_session import MqttParams, RoborockMqttSession
 from .protocol import MessageParser, Utils, md5hex
 from .roborock_message import RoborockMessage, RoborockMessageProtocol
@@ -36,8 +37,8 @@ class RoborockDevice:
         self._message_id_types: dict[int, DeviceTrait] = {}
         self._command_to_trait = {}
         self._all_supported_traits = []
-        self._dnd_trait: DndTrait | None = self.determine_supported_traits(DndTrait)
-        self._consumable_trait: ConsumableTrait | None = self.determine_supported_traits(ConsumableTrait)
+        self._dnd_trait: Dnd | None = self.determine_supported_traits(Dnd)
+        # self._consumable_trait: ConsumableTrait | None = self.determine_supported_traits(ConsumableTrait)
         self._status_type: type[Status] = ModelStatus.get(device_info.model, S7MaxVStatus)
         # TODO: One per client EVER
         self.session = RoborockMqttSession(
@@ -153,11 +154,3 @@ class RoborockDevice:
 
             # This should also probably be split with on_cloud_message and on_local_message.
             print(message)
-
-    @property
-    def dnd(self) -> DndTrait | None:
-        return self._dnd_trait
-
-    @property
-    def consumable(self) -> ConsumableTrait | None:
-        return self._consumable_trait

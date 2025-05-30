@@ -1184,3 +1184,12 @@ class DyadSndState(RoborockBase):
 @dataclass
 class DyadOtaNfo(RoborockBase):
     mqttOtaData: dict
+
+
+@dataclass
+class DndActions(RoborockBase):
+    dry: int | None = None
+    dust: int | None = None
+    led: int | None = None
+    resume: int | None = None
+    vol: int | None = None
