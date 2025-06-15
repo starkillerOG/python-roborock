@@ -30,7 +30,6 @@ class RoborockDevice:
         rriot = user_data.rriot
         hashed_user = md5hex(rriot.u + ":" + rriot.k)[2:10]
         url = urlparse(rriot.r.m)
-        mqtt_password = rriot.s
 
         self._local_endpoint = "abc"
         self._nonce = secrets.token_bytes(16)

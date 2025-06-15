@@ -3,7 +3,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 
 from . import RoborockCommand
-from .containers import DeviceFeatures, RoborockBase
+from .containers import DeviceFeatures
 
 
 @dataclass
@@ -12,7 +12,6 @@ class DeviceTrait(ABC):
 
     def __init__(self, send_command: Callable[..., Awaitable[None]]):
         self.send_command = send_command
-        self.status: RoborockBase | None = None
         self.subscriptions = []
 
     @classmethod
@@ -21,11 +20,11 @@ class DeviceTrait(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def from_dict(cls, data: dict) -> bool:
+    def update(cls, data: dict) -> bool:
         raise NotImplementedError
 
     def on_message(self, data: dict) -> None:
-        self.status = self.from_dict(data)
+        self.status = self.update(data)
         for callback in self.subscriptions:
             callback(self.status)
 
