@@ -1,5 +1,6 @@
 """Tests for the DeviceManager class."""
 
+from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest
@@ -12,6 +13,13 @@ from roborock.exceptions import RoborockException
 from .. import mock_data
 
 USER_DATA = UserData.from_dict(mock_data.USER_DATA)
+
+
+@pytest.fixture(autouse=True)
+def setup_mqtt_session() -> Generator[None, None, None]:
+    """Fixture to set up the MQTT session for the tests."""
+    with patch("roborock.devices.device_manager.create_mqtt_session"):
+        yield
 
 
 async def home_home_data_no_devices() -> HomeData:
@@ -52,12 +60,15 @@ async def test_with_device() -> None:
     assert device.name == "Roborock S7 MaxV"
     assert device.device_version == DeviceVersion.V1
 
+    await device_manager.close()
+
 
 async def test_get_non_existent_device() -> None:
     """Test getting a non-existent device."""
     device_manager = await create_device_manager(USER_DATA, mock_home_data)
     device = await device_manager.get_device("non_existent_duid")
     assert device is None
+    await device_manager.close()
 
 
 async def test_home_data_api_exception() -> None:
