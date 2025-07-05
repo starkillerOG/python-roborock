@@ -142,6 +142,11 @@ async def connected_mqtt_client_fixture(
     response_queue.put(mqtt_packet.gen_suback(1, 0))
     await mqtt_client.async_connect()
     yield mqtt_client
+    if mqtt_client.is_connected():
+        try:
+            await mqtt_client.async_disconnect()
+        except Exception:
+            pass
 
 
 async def test_async_connect(received_requests: Queue, connected_mqtt_client: RoborockMqttClientV1) -> None:
@@ -207,7 +212,7 @@ async def test_disconnect_failure_response(
     # further messages and there is no parsing error, and no failed log messages.
     response_queue.put(mqtt_packet.gen_disconnect(reason_code=1))
     assert connected_mqtt_client.is_connected()
-    with caplog.at_level(logging.ERROR, logger="homeassistant.components.nest"):
+    with caplog.at_level(logging.ERROR):
         await connected_mqtt_client.async_disconnect()
         assert not connected_mqtt_client.is_connected()
         assert not caplog.records
